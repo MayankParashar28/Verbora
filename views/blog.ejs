@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/header') %>
+        <style>
+            .share-buttons a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                font-size: 16px;
+                color: white;
+                text-decoration: none;
+                transition: 0.3s;
+                margin: 0 5px;
+            }
+
+            .like-button {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                font-size: 18px;
+                color: #dc3545;
+                border: none;
+                background: none;
+                transition: 0.3s ease-in-out;
+            }
+
+            .like-button i {
+                font-size: 24px;
+                margin-right: 5px;
+                transition: 0.3s;
+            }
+
+            .follow-btn {
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: 0.3s;
+                border: 2px solid #007bff;
+                background-color: #007bff;
+                color: white;
+            }
+
+            .follow-btn.unfollow {
+                background-color: white;
+                color: #007bff;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                /* Allows wrapping */
+                word-wrap: break-word;
+                /* Ensures long words break */
+                overflow-x: auto;
+                /* Allows horizontal scrolling only when needed */
+                max-width: 100%;
+                /* Prevents it from exceeding the container */
+            }
+        </style>
+</head>
+
+<body class="p-2">
+    <%- include('./partials/nav', { searchQuery: searchQuery }) %>
+        <% var blogUrl="https://yourwebsite.com/blog/" + blog._id; %>
+
+            <div class="container mt-3">
+                <% if (success_msg.length> 0) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <%= success_msg %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <% } %>
+
+                        <% if (error_msg.length> 0) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <%= error_msg %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                            <% } %>
+            </div>
+
+
+            <div class="container mt-4">
+                <article class="p-4 bg-light shadow rounded">
+                    <h1 class="fw-bold">
+                        <%= blog.title %>
+                    </h1>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="text-muted"><i class="far fa-calendar-alt"></i>
+                            <%= formattedDate %>
+                        </h6>
+                        <h6 class="text-muted"><i class="far fa-eye"></i>
+                            <%= blog.views %> views
+                        </h6>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <img class="rounded shadow-lg img-fluid" src="<%= blog.coverImageURL %>" alt="Blog Cover">
+                    </div>
+
+                    <pre class="mt-4 lead">
+                <%= blog.body.split(" ").slice(0, 600).join(" ") %> 
+               
+                     </pre>
+
+                    <div class="d-flex gap-3 align-items-center mt-3">
+                        <button class="like-button" id="likeButton" data-blog-id="<%= blog._id %>">
+                            <i id="likeIcon"
+                                class="<%= user && blog.likedBy.includes(user._id.toString()) ? 'fas text-primary' : 'far' %> fa-thumbs-up fs-4"></i>
+
+                            <% if (user && blog.createdBy._id.toString()===user._id.toString()) { %>
+                                <span id="likeCount" class="ms-2 text-muted fs-5">
+                                    <%= blog.likes || 0 %>
+                                </span>
+                                <% } %>
+                        </button>
+
+                        <div class="share-buttons">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=<%= blogUrl %>" target="_blank">
+                                <i class="fab fa-facebook-square fa-2x text-primary"></i>
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url=<%= blogUrl %>" target="_blank">
+                                <i class="fab fa-twitter-square fa-2x text-info"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url=<%= blogUrl %>"
+                                target="_blank">
+                                <i class="fab fa-linkedin fa-2x text-primary"></i>
+                            </a>
+                            <a href="https://wa.me/?text=<%= blogUrl %>" target="_blank">
+                                <i class="fab fa-whatsapp fa-2x text-success"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+
+                <!-- Author & Follow Section -->
+                <div class="mt-4 p-3 container d-flex p-1 bd-highlight user-select-none justify-content-between align-items-center ">
+                    <% if (user && String(user._id) !== String(blog.createdBy._id)) { %>
+                        <form method="POST" action="/user/follow/<%= blog.createdBy._id %>">
+                            <button type="submit" class="btn <%= (user.following && user.following.includes(blog.createdBy._id)) ? 'btn-success' : 'btn-primary' %>">
+                                <%= (user.following && user.following.includes(blog.createdBy._id)) ? 'Followed' : 'Follow' %>
+                            </button>
+                        </form>
+                    <% } %>
+                    <h5 class="ms-3 text-muted">@ <%= blog.createdBy.fullName %></h5>
+                </div>
+                
+            </div>
+
+
+            <!-- comments section -->
+            <div class="mt-4 p-3 container">
+                <label class="form-label fw-bold fs-3">Comments (<%= comments.length %>)</label>
+
+                <% if (user) { %>
+                    <form method="post" action="/blog/comment/<%= blog._id %>">
+                        <div class="d-flex gap-3">
+                            <input type="text" class="form-control" placeholder="Leave a comment..." name="content"
+                                required />
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                    <% } else { %>
+                        <p class="mt-2">Please <a href="/user/signin">login</a> to comment.</p>
+                        <% } %>
+            </div>
+
+            <!-- Display Comments -->
+            <div class="container mt-4">
+                <% comments.forEach(comment=> { %>
+                    <div class="d-flex justify-content-start bg-light align-items-baseline p-2 mb-2 rounded">
+                        <div class="d-flex justify-content-start align-items-baseline gap-2 p-2 rounded">
+                            <h6 class="fst-italic">
+                                <%= comment.createdBy.fullName %>:
+                            </h6>
+                            <p class="fw-bold fst-italic text-muted">
+                                <%= comment.content %>
+                            </p>
+                        </div>
+                        <p class="fw-lighter fst-italic text-muted ms-auto">
+                            <%= moment(comment.createdAt).fromNow() %>
+                        </p>
+                    </div>
+                    <% }) %>
+            </div>
+
+            <script> // For Like Button
+                document.addEventListener("DOMContentLoaded", function () {
+                    const likeButton = document.getElementById("likeButton");
+                    const likeIcon = document.getElementById("likeIcon");
+                    const likeCount = document.getElementById("likeCount");
+
+                    if (likeButton) {
+                        likeButton.addEventListener("click", async function () {
+                            const blogId = this.getAttribute("data-blog-id");
+
+                            try {
+                                const response = await fetch(`/blog/like/${blogId}`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                });
+
+                                const data = await response.json();
+                                if (data.success) {
+                                    // ✅ Toggle like button UI
+                                    likeIcon.classList.toggle("fas", data.liked);
+                                    likeIcon.classList.toggle("far", !data.liked);
+
+                                    // ✅ Update like count
+                                    likeCount.textContent = data.likes;
+                                } else {
+                                    alert("Failed to like blog. Please try again.");
+                                }
+                            } catch (error) {
+                                console.error("Error liking blog:", error);
+                            }
+                        });
+                    }
+                });
+            </script>
+
+            <script> // For Follow Button
+                document.addEventListener("DOMContentLoaded", function () {
+                    const followButton = document.getElementById("followBtn");
+
+                    if (followButton) {
+                        followButton.addEventListener("click", async function () {
+                            const userId = this.getAttribute("data-user-id");
+
+                            try {
+                                const response = await fetch(`/follow/${userId}`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                });
+
+                                const data = await response.json();
+                                if (data.success) {
+                                    this.textContent = data.following ? "Unfollow" : "Follow";
+                                    this.classList.toggle("unfollow", data.following);
+                                } else {
+                                    alert(data.message);
+                                }
+                            } catch (error) {
+                                console.error("Error following/unfollowing:", error);
+                            }
+                        });
+                    }
+                });
+            </script>
+</body>
+
+</html>

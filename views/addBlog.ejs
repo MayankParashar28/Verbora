@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('./partials/header') %>
+    <title>signin</title>
+</head>
+
+<style>
+  textarea {
+      width: 100%;
+      min-height: 50px;
+      font-size: 16px;
+     
+      resize: none; /* Disable manual resizing */
+      overflow-y: hidden; /* Hide scrollbar */
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      text-align: left; /* Ensures text starts from the left */
+  }
+  </style>
+
+<body class=" p-2">
+  <%- include('./partials/nav', { searchQuery: searchQuery || "" }) %>
+
+    <div class=" big-container justify-content-center align-items-center  m-2  mt-4 p-3 gap-4 border border-2 rounded-3 shadow">
+
+      <form method="post" action="/blog" enctype="multipart/form-data">
+        <div class="mb-3 p-1">
+          <label for="coverImage" class="form-label">Cover Image</label>
+          <input type="file" class="form-control bg-transparent" id="coverImage" name="coverImage" aria-describedby="coverImage" accept="image/*" required>
+        </div>
+      
+        <div class="mb-3 p-1">
+          <label for="title" class="form-label">Title</label>
+          <input type="text" class="form-control bg-transparent text-black" 
+              name="title" id="title" 
+              aria-describedby="title" 
+              placeholder="Enter your title here..." 
+              required>
+        </div>
+        
+        <div class="mb-3 p-1">
+          <label for="body" class="form-label">Body</label>
+          <div class="form-floating position-relative">
+              <textarea class="form-control bg-transparent text-black pb-2" 
+                  name="body" id="body"
+                  style="resize: none; overflow: hidden; min-height: 100px; max-height: 400px;" 
+                  required oninput="handleInput(this)" placeholder="Write your Blog here ( Under 600 words) "></textarea>
+              <label for="body">Write your Blog here ( Under 600 words) </label> <!-- Floating label -->
+          </div>
+      
+      </div>
+      
+      <p class="text-muted ml-2">Word count: <span id="word-count">0</span></p>
+      
+    
+      
+        <!-- categories section -->
+        <div class="category-selector mb-4 p-3">
+          <label class="form-label">Select Category</label>
+          <div class="row g-3">
+            <% const categories=[ { name: 'Technology' , icon: 'microchip' }, { name: 'Health' , icon: 'heartbeat' }, {
+              name: 'Education' , icon: 'graduation-cap' }, { name: 'Business' , icon: 'briefcase' }, {
+              name: 'Lifestyle' , icon: 'spa' }, { name: 'Travel' , icon: 'plane-departure' }, { name: 'Food' ,
+              icon: 'utensils' }, { name: 'Finance' , icon: 'chart-line' }, { name: 'Science' , icon: 'flask' }, {
+              name: 'Entertainment' , icon: 'film' } ]; %>
+              <% categories.forEach(category=> { %>
+                <div class="col-6 col-md-4 col-lg-3">
+                  <input type="radio" class="btn-check" name="category" id="<%= category.name %>"
+                    value="<%= category.name %>" autocomplete="off" required>
+                  <label class="btn btn-outline-primary w-100 category-card" for="<%= category.name %>">
+                    <i class="fas fa-<%= category.icon %> me-2"></i>
+                    <%= category.name %>
+                  </label>
+                </div>
+              <% }); %>
+          </div>
+        </div>
+      
+        <!-- tags section -->
+        <div class="mb-3 p-3">
+          <label for="tags" class="form-label">Tags (comma-separated)</label>
+          <input type="text" class="form-control bg-transparent text-black" name="tags" id="tags"
+            placeholder="e.g., AI, Machine Learning, Health" autocomplete="off" list="tagsList" required>
+          <datalist id="tagsList">
+            <option>Ai</option>
+            <option>Health</option>
+            <option>Education</option>
+            <option>Business</option>
+            <option>Lifestyle</option>
+            <option>Travel</option>
+            <option>Food</option>
+            <option>Finance</option>
+            <option>Science</option>
+            <option>Entertainment</option>
+            <option>Technology</option>
+            <option>Hardware</option>  
+            <option>Machine Learning</option>
+            <option>Deep Learning</option>
+            <option>Artificial Intelligence</option>
+            <option>Python</option>
+          </datalist>
+        </div>
+      
+        <div class="p-1 ">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+
+    </div>
+
+    <%- include('./partials/script') %>
+  
+    
+    <%- include('./partials/footer') %>
+    
+    <script>
+    function handleInput(textarea) {
+        // Ensure text starts from the left
+        textarea.style.textAlign = "left";  // Left-aligned
+        textarea.style.direction = "ltr";  // Left-to-right
+        
+        // Auto-resize
+        textarea.style.height = "auto"; // Reset height
+        textarea.style.height = textarea.scrollHeight + "px"; // Adjust height dynamically
+    
+        // Count words
+        let words = textarea.value.trim().split(/\s+/).filter(word => word.length > 0); // Split by whitespace
+        let wordCount = words.length;
+    
+        // Display word count
+        document.getElementById("word-count").innerText = `${wordCount} / 600` ;
+    
+        // Restrict to 600 words
+        if (wordCount > 600) {
+            alert("You have reached the 600-word limit!");
+            textarea.value = words.slice(0, 600).join(" "); // Keep only the first 600 words
+            textarea.style.height = textarea.scrollHeight + "px"; // Re-adjust after trimming
+        }
+    }
+    </script>
+    
+   
+  <!-- <script> //ai generate button
+    document.getElementById("ai-generate-btn").addEventListener("click", async () => {
+      const title = document.getElementById("title").value.trim();
+      const body = document.getElementById("body").value.trim();
+      const userId = "USER_ID_FROM_SESSION"; // Replace with logged-in user's ID
+  
+      if (!title) {
+          alert("Please enter a title before generating content.");
+          return;
+      }
+  
+      try {
+          // 🎯 Check Subscription & Request AI Generation
+          const response = await fetch("/blog/generate-ai", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userId, title, body }),
+          });
+  
+          const data = await response.json();
+  
+          if (response.status === 403) {
+              alert("🚨 You need a subscription to generate AI blogs.");
+              window.location.href = "/subscribe"; // Redirect to subscription page
+              return;
+          }
+  
+          if (response.ok) {
+              document.getElementById("body").value = data.generatedContent;
+              document.getElementById("word-count").innerText = data.wordCount;
+          } else {
+              alert("AI generation failed: " + data.error);
+          }
+      } catch (error) {
+          console.error("🔥 AI Generation Error:", error);
+          alert("Something went wrong while generating the blog.");
+      }
+  });
+    </script> -->
+    
+
+</body>
+
+</html>

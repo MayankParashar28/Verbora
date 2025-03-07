@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('./partials/header') %>
+    <title>signin</title>
+    <link rel="icon" type="image/png" href="/path/to/favicon.png">
+</head>
+
+<body >
+  <div class="container-signin" style="padding: 2rem 3rem;">
+    <form action="/user/signin" method="post">
+
+      <div class="mb-5">
+        <label for="email" class="form-label">Email address</label>
+        <input type="email" class="form-control shadow-lg " name="email" id="exampleInputEmail1"
+          aria-describedby="emailHelp">
+        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+      </div>
+      <div class="mb-5">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <input type="password" class="form-control shadow-lg " name="passward" id="exampleInputPassword1">
+      </div>
+
+       <!-- CAPTCHA Section -->
+  <label>Enter CAPTCHA:</label><br>
+  <img src="/captcha" alt="CAPTCHA" id="captcha-image" class="rounded"">
+  <button type="button" class=" m-4 border border-none " onclick="refreshCaptcha()">🔄 Refresh</button>
+  <br><br>
+
+  <input type="text" class="border border-2 rounded" name="captcha" required>
+  <br><br>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  <script>
+    function refreshCaptcha() {
+      document.getElementById("captcha-image").src = "/captcha?" + Date.now();
+    }
+
+    
+  </script>
+  <%- include('./partials/script') %>
+</body>
+
+</html>

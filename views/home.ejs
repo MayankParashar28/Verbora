@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/header') %>
+
+<head>
+    <title>Blogs</title>
+    <link rel="icon" type="image/png" href="/path/to/favicon.png">
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="p-2">
+    <%- include('./partials/nav') %>
+
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <% blogs.forEach(blog => { %>
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
+                    <div class="card border border-4-black h-100">
+                        <div class="p-1">
+                            <img src="<%= blog.coverImageURL %>"
+                                class="card-img-top object-cover rounded border-bottom border-4-black"
+                                alt="Blog Image" width="100%" height="150px">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title"><%= blog.title %></h5>
+                            <p class="card-text"><%= blog.body.substring(0, 100) + "..." %></p>
+
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <%= moment(blog.createdAt).fromNow() %>
+                                </small>
+                            </p>
+
+                            <% if (blog.category) { %>
+                                <div>Category:
+                                    <span class="badge bg-primary px-2 text-xs">
+                                        <%= blog.category %>
+                                    </span>
+                                </div>
+                            <% } else { %>
+                                <div class="text-muted">Category: No category</div>
+                            <% } %>
+
+                            <% if (blog.tags && blog.tags.length > 0) { %>
+                                <div>Tags:
+                                    <% blog.tags.forEach(tag => { %>
+                                        <span class="badge bg-danger px-2 text-xs">
+                                            #<%= tag %>
+                                        </span>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <p class="text-muted">Tags: No tags</p>
+                            <% } %>
+
+                            <a href="/blog/<%= blog._id %>" class="btn btn-primary mt-2">View</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <%- include('./partials/script') %>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <%- include('./partials/footer') %>
+</body>
+
+</html>

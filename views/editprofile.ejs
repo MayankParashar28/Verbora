@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/header') %>
+    <title>Edit Profile - Blogify</title>
+
+</head>
+
+<body>
+   
+
+
+<div class="container m-4 ">
+    <h2 class="fw-bold text-center mb-3">Edit Profile</h2>
+
+    <form action="/user/edit-profile" method="POST" class="bg-light p-4 rounded shadow">
+        <div class="mb-3">
+            <label for="fullName" class="form-label">Full Name:</label>
+            <input type="text" name="fullName" class="form-control" value="<%= user.fullName || '' %>">
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" name="email" class="form-control" value="<%= user.email || '' %>">
+        </div>
+
+        <div class="mb-3">
+            <label for="bio" class="form-label">Bio:</label>
+            <textarea name="bio" class="form-control" rows="3"><%= user.bio || '' %></textarea>
+        </div>
+
+        <h3 class="fw-bold mt-4 mb-3">Social Links</h3>
+
+        
+
+        <div class="mb-3">
+            <label for="linkedin" class="form-label">LinkedIn:</label>
+            <input type="url" name="socials[linkedin]" class="form-control" value="<%= user.socials?.linkedin || '' %>">
+        </div>
+
+        <div class="mb-3">
+            <label for="twitter" class="form-label">Twitter:</label>
+            <input type="url" name="socials[twitter]" class="form-control" value="<%= user.socials?.twitter || '' %>">
+        </div>
+
+        <div class="mb-3">
+            <label for="github" class="form-label">GitHub:</label>
+            <input type="url" name="socials[github]" class="form-control" value="<%= user.socials?.github || '' %>">
+        </div>
+
+        <div class="mb-3">
+            <label for="instagram" class="form-label">Instagram:</label>
+            <input type="url" name="socials[instagram]" class="form-control" value="<%= user.socials?.instagram || '' %>">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-3">Update Profile</button>
+    </form>
+</div>
+
+<%- include('./partials/footer') %>
+</body>
