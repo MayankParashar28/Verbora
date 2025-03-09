@@ -8,6 +8,7 @@ const Blog = require("../models/blog");
 const marked = require("marked");
 const { checkSubscription } = require("../middleware/subscription");
 const { generateBlogWithAI } = require("../utils/aiHelper");
+const { error } = require("console");
 
 
 
@@ -24,16 +25,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage,
-  fileFilter: function (req, file, cb) {
-    const filetypes = /jpeg|jpg|png/;
-    const limits = { fileSize: 1024 * 1024 * 1 }; 
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    if (mimetype && extname && file.size <= limits.fileSize) {
-      return cb(null, true);
-    }
-    cb("Error: Images Only!");
-  },
+  
+
  });
 
  // 📝 Create a Blog
